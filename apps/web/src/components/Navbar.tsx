@@ -1,28 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { auth } from "@/lib/firebase.client";
-import { onAuthStateChanged } from "firebase/auth";
-import { logout } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 export default function Navbar() {
-  const [email, setEmail] = useState<string | null>(null);
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    return onAuthStateChanged(auth, (u) => setEmail(u?.email ?? null));
-  }, []);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+  };
+
+  if (loading) return null; // Or a spinner
 
   return (
-    <div style={{ display: "flex", gap: 16, padding: 16, borderBottom: "1px solid #ddd" }}>
-      <Link href="/">Deadline Shield</Link>
-      <Link href="/dashboard">Dashboard</Link>
-      <Link href="/billing">Billing</Link>
+    <div style={{ display: "flex", gap: 16, padding: 16, borderBottom: "1px solid #ddd", alignItems: "center" }}>
+      <Link href="/" style={{ fontWeight: 'bold' }}>Deadline Shield</Link>
+
+      {user && (
+        <>
+          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/changes">Changes</Link>
+        </>
+      )}
+
       <div style={{ marginLeft: "auto" }}>
-        {email ? (
-          <button onClick={logout}>Sign out ({email})</button>
+        {user ? (
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <span style={{ fontSize: '0.9em', color: '#666' }}>{user.email}</span>
+            <button onClick={handleLogout} style={{ padding: '6px 12px', cursor: 'pointer' }}>Sign out</button>
+          </div>
         ) : (
-          <Link href="/auth">Sign in</Link>
+          <Link href="/auth/login" style={{ padding: '6px 12px', background: '#0070f3', color: 'white', borderRadius: 4, textDecoration: 'none' }}>Login</Link>
         )}
       </div>
     </div>

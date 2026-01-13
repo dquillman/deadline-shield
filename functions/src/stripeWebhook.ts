@@ -15,7 +15,7 @@ export async function stripeWebhookHandler(req: Request, res: Response) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.rawBody, sig as string, whsec);
+    event = stripe.webhooks.constructEvent((req as any).rawBody, sig as string, whsec);
   } catch (err: any) {
     res.status(400).send(`Webhook Error: ${err.message}`);
     return;

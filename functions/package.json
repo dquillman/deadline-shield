@@ -8,6 +8,9 @@
     "serve": "firebase emulators:start --only functions"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "cheerio": "^1.1.2",
+    "firebase": "^12.7.0",
     "firebase-admin": "^12.7.0",
     "firebase-functions": "^5.1.1",
     "stripe": "^16.12.0"
