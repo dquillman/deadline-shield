@@ -20,7 +20,10 @@ export default function Navbar() {
 
   return (
     <div style={{ display: "flex", gap: 16, padding: 16, borderBottom: "1px solid #ddd", alignItems: "center" }}>
-      <Link href="/" style={{ fontWeight: 'bold' }}>Deadline Shield</Link>
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 'bold' }}>
+        <img src="/logo.png" alt="Deadline Shield Logo" style={{ width: 32, height: 32 }} />
+        Deadline Shield
+      </Link>
 
       {user && (
         <>
