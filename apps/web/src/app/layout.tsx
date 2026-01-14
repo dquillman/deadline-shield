@@ -3,7 +3,10 @@ import { AuthProvider } from "@/lib/auth";
 
 export const metadata = {
   title: "Deadline Shield",
-  description: "Never miss a compliance change."
+  description: "Never miss a compliance change.",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
