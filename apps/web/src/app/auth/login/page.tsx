@@ -17,7 +17,19 @@ export default function LoginPage() {
             await signInWithEmailAndPassword(auth, email, password);
             router.push("/dashboard");
         } catch (err: any) {
-            setError(err.message);
+            // Map Firebase error codes to user-friendly messages
+            const code = err.code || '';
+            if (code === 'auth/user-not-found') {
+                setError('No account found with this email. Please sign up first.');
+            } else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+                setError('Incorrect password. Please try again.');
+            } else if (code === 'auth/invalid-email') {
+                setError('Invalid email address.');
+            } else if (code === 'auth/too-many-requests') {
+                setError('Too many failed attempts. Please try again later.');
+            } else {
+                setError(err.message || 'Login failed. Please try again.');
+            }
         }
     };
 
@@ -32,6 +44,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    autoComplete="email"
                     style={{ padding: 8 }}
                 />
                 <input
@@ -40,6 +53,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                     style={{ padding: 8 }}
                 />
                 <button type="submit" style={{ padding: 10, background: "#0070f3", color: "white", border: "none" }}>

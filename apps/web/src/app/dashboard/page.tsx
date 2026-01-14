@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../lib/auth";
-import { db } from "../../lib/firebase";
-import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, getCountFromServer } from "firebase/firestore";
+import { db, functions } from "../../lib/firebase";
+import { collection, query, where, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
 import { MonitoredSource, PLAN_LIMITS } from "../../lib/types";
@@ -31,25 +32,17 @@ export default function DashboardPage() {
     e.preventDefault();
     setError("");
     setAdding(true);
-    if (!user || !profile) return;
+    if (!user) return;
 
     try {
-      // Check limits
-      const plan = profile.plan as keyof typeof PLAN_LIMITS;
-      const limit = PLAN_LIMITS[plan] || 5;
-      if (sources.length >= limit) {
-        throw new Error(`Plan limit reached (${limit}). Upgrade to add more.`);
-      }
-
-      await addDoc(collection(db, "sources"), {
-        userId: user.uid,
+      // Use Callable Function for Server-Side Tier Enforcement
+      const createSourceFn = httpsCallable(functions, 'createSource');
+      await createSourceFn({
         name: newSource.name,
         url: newSource.url,
-        frequency: newSource.frequency,
-        lastChecked: null,
-        lastStatus: "No Change",
-        createdAt: serverTimestamp(),
+        frequency: newSource.frequency
       });
+
       setNewSource({ name: "", url: "", frequency: "Daily" });
     } catch (err: any) {
       setError(err.message);
@@ -64,6 +57,20 @@ export default function DashboardPage() {
       await deleteDoc(doc(db, "sources", id));
     } catch (err: any) {
       alert(err.message);
+    }
+  };
+
+  const handleMarkVerified = async (id: string) => {
+    if (!confirm("Confirm you have manually verified this source?")) return;
+    try {
+      await updateDoc(doc(db, "sources", id), {
+        needsCheck: false,
+        lastStatus: "Verified",
+        lastVerifiedAt: serverTimestamp(),
+        consecutiveFailures: 0 // Reset failures on manual confirm
+      });
+    } catch (err: any) {
+      alert("Error updating status: " + err.message);
     }
   };
 
@@ -125,29 +132,49 @@ export default function DashboardPage() {
           </tr>
         </thead>
         <tbody>
-          {sources.map(source => (
-            <tr key={source.id} style={{ borderBottom: '1px solid #ddd' }}>
-              <td style={{ padding: 10 }}>{source.name}</td>
-              <td style={{ padding: 10 }}>
-                <a href={source.url} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
-                  Link
-                </a>
-              </td>
-              <td style={{ padding: 10 }}>{source.frequency}</td>
-              <td style={{ padding: 10 }}>
-                <span style={{
-                  color: source.lastStatus === 'Changed' ? 'red' : source.lastStatus === 'Error' ? 'orange' : 'green',
-                  fontWeight: 'bold'
-                }}>
-                  {source.lastStatus}
-                </span>
-                {source.lastChecked && <div style={{ fontSize: '0.8em', color: '#666' }}>Checked: {new Date(source.lastChecked.seconds * 1000).toLocaleDateString()}</div>}
-              </td>
-              <td style={{ padding: 10 }}>
-                <button onClick={() => source.id && handleDelete(source.id)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
-              </td>
-            </tr>
-          ))}
+          {sources.map(source => {
+            const statusColor =
+              source.lastStatus === 'Changed' ? 'red' :
+                source.lastStatus === 'Error' ? 'orange' :
+                  source.lastStatus?.includes('Blocked') ? 'darkred' :
+                    source.lastStatus?.includes('Needs') ? '#b8860b' /* Dark GoldenRod */ :
+                      'green';
+
+            return (
+              <tr key={source.id} style={{ borderBottom: '1px solid #ddd' }}>
+                <td style={{ padding: 10 }}>
+                  {source.name}
+                  {source.manualOnly && <span style={{ fontSize: '0.7em', background: '#333', color: 'white', padding: '2px 4px', borderRadius: 3, marginLeft: 5 }}>MANUAL</span>}
+                </td>
+                <td style={{ padding: 10 }}>
+                  <a href={source.url} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
+                    Link
+                  </a>
+                </td>
+                <td style={{ padding: 10 }}>{source.frequency}</td>
+                <td style={{ padding: 10 }}>
+                  <span style={{ color: statusColor, fontWeight: 'bold' }}>
+                    {source.lastStatus}
+                  </span>
+                  {source.lastChecked && <div style={{ fontSize: '0.8em', color: '#666' }}>Checked: {new Date(source.lastChecked.seconds * 1000).toLocaleDateString()}</div>}
+
+                  {source.needsCheck && (
+                    <div style={{ marginTop: 5 }}>
+                      <button
+                        onClick={() => source.id && handleMarkVerified(source.id)}
+                        style={{ fontSize: '0.8em', background: 'green', color: 'white', border: 'none', padding: '4px 8px', cursor: 'pointer', borderRadius: 4 }}
+                      >
+                        Mark Verified
+                      </button>
+                    </div>
+                  )}
+                </td>
+                <td style={{ padding: 10 }}>
+                  <button onClick={() => source.id && handleDelete(source.id)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
+                </td>
+              </tr>
+            );
+          })}
           {sources.length === 0 && (
             <tr>
               <td colSpan={5} style={{ padding: 20, textAlign: 'center', color: '#666' }}>No sources monitored yet. Add one above.</td>

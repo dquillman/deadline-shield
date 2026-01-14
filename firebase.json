@@ -11,7 +11,15 @@
       ]
     }
   ],
-"firestore": {
-  "rules": "firestore.rules"
-}
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "source": "apps/web",
+    "ignore": [
+      "firebase.json",
+      ".git",
+      "**/node_modules/**"
+    ]
+  }
 }

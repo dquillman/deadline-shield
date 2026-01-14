@@ -12,8 +12,17 @@ export interface MonitoredSource {
     url: string;
     frequency: 'Daily' | 'Weekly';
     lastChecked?: any; // Firestore Timestamp
-    lastStatus?: 'No Change' | 'Changed' | 'Error';
+    lastStatus?: 'No Change' | 'Changed' | 'Error' | 'Blocked - Manual Verification Required' | 'Needs Manual Verification' | 'Verified';
     lastHash?: string;
+
+    // Hardening / Operational Visibility
+    consecutive403?: number;
+    manualOnly?: boolean;
+    needsCheck?: boolean;
+    lastRunAt?: any; // Timestamp
+    lastError?: string | null;
+    lastVerifiedAt?: any; // Timestamp
+    consecutiveFailures?: number;
 }
 
 export interface ChangeLog {

@@ -32,7 +32,19 @@ export default function SignupPage() {
 
             router.push("/dashboard");
         } catch (err: any) {
-            setError(err.message);
+            // Map Firebase error codes to user-friendly messages
+            const code = err.code || '';
+            if (code === 'auth/email-already-in-use') {
+                setError('An account with this email already exists. Please login instead.');
+            } else if (code === 'auth/invalid-email') {
+                setError('Invalid email address.');
+            } else if (code === 'auth/weak-password') {
+                setError('Password is too weak. Please use at least 6 characters.');
+            } else if (code === 'auth/operation-not-allowed') {
+                setError('Email/Password sign-up is not enabled. Please contact support.');
+            } else {
+                setError(err.message || 'Sign up failed. Please try again.');
+            }
         }
     };
 
@@ -47,6 +59,7 @@ export default function SignupPage() {
                     value={org}
                     onChange={(e) => setOrg(e.target.value)}
                     required
+                    autoComplete="organization"
                     style={{ padding: 8 }}
                 />
                 <input
@@ -55,6 +68,7 @@ export default function SignupPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    autoComplete="email"
                     style={{ padding: 8 }}
                 />
                 <input
@@ -63,6 +77,7 @@ export default function SignupPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="new-password"
                     style={{ padding: 8 }}
                 />
                 <button type="submit" style={{ padding: 10, background: "#0070f3", color: "white", border: "none" }}>
