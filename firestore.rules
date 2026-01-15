@@ -13,8 +13,14 @@ service cloud.firestore {
     match /sources/{sourceId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       // CREATE is now disallowed from client. Must use Callable Function 'createSource'.
-      // Allow update/delete for owners (e.g. to edit URL or delete source)
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Allow update for owners, but restrict to Phase 3 hardening fields
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'verifiedAt', 'verifiedBy', 'verifiedReason', 'verifiedNote', 'verifiedHash', 'verifiedFingerprint',
+          'status', 'pausedAt', 'pausedBy', 'pauseReason', 'nextCheckAt', 'consecutiveFailures', 'needsCheck', 'lastStatus', 'lastVerifiedAt',
+          'alertThreshold', 'alertMode'
+        ]);
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
     
     // Change Logs
@@ -22,6 +28,11 @@ service cloud.firestore {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       // Only backend (Functions) should write changes, but we might allow read-only for client
       // We will allow no public writes. Admin SDK bypasses rules.
+    }
+
+    // Audit Logs
+    match /audit_logs/{logId} {
+      allow read, create: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
   }
 }

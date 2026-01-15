@@ -5,8 +5,8 @@ export default function Home() {
   return (
     <div style={{ textAlign: "center", marginTop: 50 }}>
       <h1>Deadline-Shield</h1>
-      <p style={{ fontSize: "1.2em", color: "#555" }}>
-        Never miss a compliance or certification change again.
+      <p style={{ fontSize: "1.25em", color: "#333", maxWidth: 600, margin: "20px auto", fontWeight: 500 }}>
+        Deadline Shield watches important pages, detects meaningful changes, and tells you what to do — so you don’t miss critical deadlines.
       </p>
 
       <div style={{ marginTop: 40, display: "flex", gap: 20, justifyContent: "center" }}>
