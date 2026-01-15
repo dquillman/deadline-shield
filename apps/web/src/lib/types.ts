@@ -2,8 +2,10 @@ export interface UserProfile {
     uid: string;
     email: string | null;
     organization?: string;
-    plan: 'Starter' | 'Pro' | 'Enterprise';
+    plan?: 'Starter' | 'Pro' | 'Enterprise';
+    sourceLimit?: number;
     onboardingComplete?: boolean;
+    themePreference?: 'system' | 'light' | 'dark';
 }
 
 export interface MonitoredSource {

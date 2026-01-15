@@ -7,6 +7,8 @@ import { httpsCallable } from "firebase/functions";
 import Link from "next/link";
 import Disclaimer from "@/components/Disclaimer";
 import { MonitoredSource, PLAN_LIMITS, UserProfile } from "../../lib/types";
+import { SettingsMenu } from "@/components/settings-menu";
+import { useTheme } from "next-themes";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -14,6 +16,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [onboardingStep, setOnboardingStep] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const { setTheme } = useTheme();
   const [newSource, setNewSource] = useState({ name: "", url: "", frequency: "Daily" });
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
@@ -39,6 +42,12 @@ export default function DashboardPage() {
         if (docSnap.exists()) {
           const data = docSnap.data() as UserProfile;
           setProfile(data);
+
+          // Apply saved theme preference
+          if (data.themePreference) {
+            setTheme(data.themePreference);
+          }
+
           if (data.onboardingComplete === false || data.onboardingComplete === undefined) {
             setOnboardingStep(1);
           }
@@ -254,54 +263,61 @@ export default function DashboardPage() {
   if (!user) return <div style={{ padding: 20 }}><Link href="/auth/login">Please Login</Link></div>;
 
   return (
-    <div style={{ padding: 20, maxWidth: 1200, margin: "0 auto", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div className="p-5 max-w-screen-xl mx-auto font-sans bg-white dark:bg-blue-950 dark:text-blue-50 min-h-screen transition-colors duration-300">
       {onboardingStep !== null && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+          <div className="bg-white dark:bg-blue-900 p-8 rounded-xl max-w-md shadow-2xl border dark:border-blue-700">
             {onboardingStep === 1 && (
               <div>
-                <h3 style={{ fontSize: '1.25rem', marginBottom: '10px' }}>🎯 What we watch</h3>
-                <p style={{ color: '#4a5568', marginBottom: '20px' }}>We monitor pages that contain deadlines, regulatory changes, or obligations.</p>
-                <button onClick={() => setOnboardingStep(2)} style={{ background: '#0070f3', color: 'white', padding: '8px 16px', borderRadius: '6px' }}>Next</button>
+                <h3 className="text-xl font-semibold mb-3 dark:text-blue-100">🎯 What we watch</h3>
+                <p className="text-gray-600 dark:text-blue-200 mb-5">We monitor pages that contain deadlines, regulatory changes, or obligations.</p>
+                <button onClick={() => setOnboardingStep(2)} className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">Next</button>
               </div>
             )}
             {onboardingStep === 2 && (
               <div>
-                <h3 style={{ fontSize: '1.25rem', marginBottom: '10px' }}>🔔 How alerts work</h3>
-                <p style={{ color: '#4a5568', marginBottom: '20px' }}>You’ll only be notified when something truly matters. We reduce noise so you can focus.</p>
-                <button onClick={() => setOnboardingStep(3)} style={{ background: '#0070f3', color: 'white', padding: '8px 16px', borderRadius: '6px' }}>Next</button>
+                <h3 className="text-xl font-semibold mb-3 dark:text-blue-100">🔔 How alerts work</h3>
+                <p className="text-gray-600 dark:text-blue-200 mb-5">You'll only be notified when something truly matters. We reduce noise so you can focus.</p>
+                <button onClick={() => setOnboardingStep(3)} className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">Next</button>
               </div>
             )}
             {onboardingStep === 3 && (
               <div>
-                <h3 style={{ fontSize: '1.25rem', marginBottom: '10px' }}>🛡️ What Guardian does</h3>
-                <p style={{ color: '#4a5568', marginBottom: '20px' }}>Guardian explains changes and recommends actions like "Update" or "Escalate".</p>
-                <button onClick={completeOnboarding} style={{ background: '#0070f3', color: 'white', padding: '8px 16px', borderRadius: '6px' }}>Got it</button>
+                <h3 className="text-xl font-semibold mb-3 dark:text-blue-100">🛡️ What Guardian does</h3>
+                <p className="text-gray-600 dark:text-blue-200 mb-5">Guardian explains changes and recommends actions like "Update" or "Escalate".</p>
+                <button onClick={completeOnboarding} className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">Got it</button>
               </div>
             )}
           </div>
         </div>
       )}
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
-        <h1>Dashboard</h1>
-        <div>
-          <span>Plan: <strong>{profile?.plan}</strong></span>
-          <span style={{ marginLeft: 15 }}>Sources: {sources.length} / {PLAN_LIMITS[profile?.plan || 'Starter']}</span>
-          <Link href="/changes" style={{ marginLeft: 20, color: 'blue' }}>View Change Logs</Link>
+      <div className="flex justify-between items-center mb-8 bg-gray-50 dark:bg-blue-900/40 p-4 rounded-xl border border-gray-100 dark:border-blue-800/50">
+        <h1 className="text-3xl font-bold dark:text-blue-100 tracking-tight">Dashboard</h1>
+        <div className="flex items-center gap-6">
+          <div className="text-sm dark:text-blue-200 hidden md:block">
+            <span className="bg-gray-200 dark:bg-blue-800 px-3 py-1 rounded-full text-xs font-medium">Plan: <strong className="dark:text-blue-100">{profile?.plan}</strong></span>
+            <span className="ml-4">Sources: {sources.length} / {PLAN_LIMITS[profile?.plan || 'Starter']}</span>
+          </div>
+          <Link href="/changes" className="text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100 hover:underline text-sm font-medium mr-2">View Logs</Link>
+          <div className="bg-white dark:bg-blue-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-blue-700 hover:border-blue-300 dark:hover:border-blue-500 transition-colors">
+            <SettingsMenu />
+          </div>
         </div>
       </div>
 
-      <div style={{ background: '#f5f5f5', padding: 20, borderRadius: 8, margin: '20px 0' }}>
-        <h3>Add New Source</h3>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <form onSubmit={handleAddSource} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div className="bg-gray-100 dark:bg-blue-900/50 p-6 rounded-xl my-6 border border-transparent dark:border-blue-800">
+        <h3 className="text-lg font-semibold mb-3 dark:text-blue-50 flex items-center gap-2">
+          <span className="text-xl">➕</span> Add New Source
+        </h3>
+        {error && <p className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">{error}</p>}
+        <form onSubmit={handleAddSource} className="flex gap-3 flex-wrap">
           <input
             placeholder="Name (e.g. PMI Exam Updates)"
             value={newSource.name}
             onChange={(e) => setNewSource({ ...newSource, name: e.target.value })}
             required
-            style={{ padding: 8, flex: 1 }}
+            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-lg border border-gray-300 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-blue-400/50"
           />
           <input
             placeholder="URL (https://...)"
@@ -309,55 +325,57 @@ export default function DashboardPage() {
             value={newSource.url}
             onChange={(e) => setNewSource({ ...newSource, url: e.target.value })}
             required
-            style={{ padding: 8, flex: 2 }}
+            className="flex-[2] min-w-[300px] px-4 py-2.5 rounded-lg border border-gray-300 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-blue-400/50"
           />
           <select
             value={newSource.frequency}
             onChange={(e) => setNewSource({ ...newSource, frequency: e.target.value })}
-            style={{ padding: 8 }}
+            className="px-4 py-2.5 rounded-lg border border-gray-300 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none cursor-pointer"
           >
             <option value="Daily">Daily</option>
             <option value="Weekly">Weekly</option>
           </select>
-          <button type="submit" disabled={adding} style={{ padding: '8px 16px', background: '#0070f3', color: 'white', border: 'none', borderRadius: 4 }}>
+          <button type="submit" disabled={adding} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:bg-blue-400 text-white rounded-lg transition-colors">
             {adding ? 'Adding...' : 'Add Source'}
           </button>
         </form>
       </div>
 
       {unacknowledgedCount === 0 && sources.length > 0 && (
-        <div style={{ background: '#f0fff4', border: '1px solid #c6f6d5', color: '#2f855a', padding: '12px', borderRadius: '8px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95em' }}>
+        <div className="bg-green-50 dark:bg-blue-900/30 border border-green-200 dark:border-blue-600 text-green-700 dark:text-blue-200 p-3 rounded-lg mb-5 flex items-center gap-2 text-sm">
           <span>🛡️</span> All monitored deadlines are currently under control.
         </div>
       )}
 
-      <div style={{ overflowX: 'auto', background: 'white', borderRadius: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #eee' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+      <div className="overflow-hidden bg-white dark:bg-blue-900/20 rounded-xl shadow-sm border border-gray-200 dark:border-blue-800">
+        <table className="w-full border-collapse text-left">
           <thead>
-            <tr style={{ borderBottom: '2px solid #eee', background: '#f9f9f9' }}>
-              <th style={{ padding: 15 }}>Source</th>
-              <th style={{ padding: 15 }}>
+            <tr className="border-b border-gray-200 dark:border-blue-800 bg-gray-50/50 dark:bg-blue-900/40">
+              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">Source</th>
+              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">
                 Status
-                <div style={{ fontSize: '0.7em', color: '#666', fontWeight: 'normal' }}>Guardian explains why changes matter</div>
+                <div className="text-xs text-gray-500 dark:text-blue-400 font-normal mt-0.5">Guardian explains why changes matter</div>
               </th>
-              <th style={{ padding: 15 }}>Last Check</th>
-              <th style={{ padding: 15 }}>Actions</th>
+              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">Last Check</th>
+              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sources.length === 0 && (
               <tr>
-                <td colSpan={4} style={{ padding: 40, textAlign: 'center', color: '#718096' }}>
-                  <div style={{ fontSize: '1.2em', marginBottom: '8px' }}>No sources added yet.</div>
-                  <div style={{ fontSize: '0.9em' }}>Deadline Shield is watching quietly. Add a URL to begin.</div>
+                <td colSpan={4} className="p-12 text-center text-gray-500 dark:text-blue-300">
+                  <div className="text-4xl mb-3 opacity-80">🔭</div>
+                  <div className="text-xl font-medium mb-2 text-gray-700 dark:text-blue-200">No sources added yet.</div>
+                  <div className="text-sm opacity-80">Deadline Shield is watching quietly. Add a URL above to begin.</div>
                 </td>
               </tr>
             )}
             {sources.length > 0 && sources.filter(s => s.lastStatus === 'Changed').length === 0 && (
               <tr>
-                <td colSpan={4} style={{ padding: 40, textAlign: 'center', color: '#718096' }}>
-                  <div style={{ fontSize: '1.2em', marginBottom: '8px' }}>No recent changes detected.</div>
-                  <div style={{ fontSize: '0.9em' }}>Everything is stable. We'll alert you if deadlines move.</div>
+                <td colSpan={4} className="p-12 text-center text-gray-500 dark:text-blue-300">
+                  <div className="text-4xl mb-3 opacity-80">✅</div>
+                  <div className="text-lg font-medium mb-1 text-gray-700 dark:text-blue-200">No recent changes detected.</div>
+                  <div className="text-sm opacity-80">Everything is stable. We'll alert you if deadlines move.</div>
                 </td>
               </tr>
             )}
@@ -374,20 +392,20 @@ export default function DashboardPage() {
               return (
                 <tr
                   key={source.id}
-                  className="hover:bg-gray-50 transition-colors"
+                  className="hover:bg-gray-50 dark:hover:bg-blue-900/30 transition-colors border-b border-gray-100 dark:border-blue-800/50 last:border-0"
                   style={{ opacity: source.ackStatus ? 0.6 : 1, filter: source.ackStatus ? 'grayscale(50%)' : 'none' }}
                 >
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">{source.name}</div>
-                    <div className="text-sm text-gray-500 truncate max-w-xs" title={source.url}>{source.url}</div>
+                  <td className="px-6 py-5">
+                    <div className="font-medium text-gray-900 dark:text-blue-50 text-lg mb-0.5">{source.name}</div>
+                    <div className="text-sm text-gray-500 dark:text-blue-300 truncate max-w-xs font-mono opacity-80" title={source.url}>{source.url}</div>
                     {source.confidenceLevel === 'HIGH' && (
-                      <div style={{ fontSize: '0.65em', color: '#2c7a7b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                      <div className="text-xs text-teal-600 dark:text-cyan-400 flex items-center gap-1 mt-2 font-medium bg-teal-50 dark:bg-cyan-950/30 px-2 py-0.5 rounded-full w-fit">
                         🛡️ Historically Stable
                       </div>
                     )}
-                    <div style={{ fontSize: '0.7em', display: 'flex', gap: 5, marginTop: 4 }}>
-                      {source.manualOnly && <span style={{ background: '#333', color: 'white', padding: '2px 4px', borderRadius: 3 }}>MANUAL</span>}
-                      {source.watchMode && <span style={{ background: '#eee', padding: '2px 4px', borderRadius: 3 }}>{source.watchMode}</span>}
+                    <div className="text-xs flex gap-2 mt-2">
+                      {source.manualOnly && <span className="bg-gray-800 dark:bg-blue-950 border border-gray-700 dark:border-blue-800 text-white dark:text-blue-200 px-2 py-0.5 rounded shadow-sm">MANUAL</span>}
+                      {source.watchMode && <span className="bg-gray-200 dark:bg-blue-900/50 dark:text-blue-200 px-2 py-0.5 rounded border border-transparent dark:border-blue-800">{source.watchMode}</span>}
                     </div>
                   </td>
                   <td style={{ padding: 10 }}>
