@@ -23,6 +23,9 @@ export interface MonitoredSource {
     lastError?: string | null;
     lastVerifiedAt?: any; // Timestamp
     consecutiveFailures?: number;
+    volatilityScore?: number;
+    lastChangeScore?: number;
+    lastChangeSeverity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 }
 
 export interface ChangeLog {
@@ -32,6 +35,9 @@ export interface ChangeLog {
     detectedAt: any; // Firestore Timestamp
     diffSummary: string;
     sourceUrl: string;
+    score?: number;
+    severity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    scoreReasons?: string[];
 }
 
 // Plan Limits

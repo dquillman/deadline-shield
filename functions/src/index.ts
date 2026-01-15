@@ -92,6 +92,57 @@ const computeHash = (content: string): string => {
   return crypto.createHash('sha256').update(content).digest('hex');
 };
 
+// --- Helper: Importance Scoring (Hardening Feature 1) ---
+const calculateImportance = (text: string): { score: number, severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL', reasons: string[] } => {
+  let score = 0;
+  const reasons: string[] = [];
+  const lowerText = text.toLowerCase();
+
+  // Heuristic 1: Urgency Keywords (+20 points each, max 60)
+  const urgencyKeywords = ['deadline', 'due date', 'compliance', 'penalty', 'enforcement', 'required', 'mandatory', 'effective date'];
+  let keywordHits = 0;
+  for (const keyword of urgencyKeywords) {
+    if (lowerText.includes(keyword)) {
+      score += 20;
+      keywordHits++;
+      if (!reasons.includes('Urgency keywords detected')) {
+        reasons.push('Urgency keywords detected');
+      }
+    }
+  }
+  // Cap keyword score contribution
+  if (keywordHits > 3) score = Math.min(score, 60);
+
+  // Heuristic 2: Date Patterns (+30 points)
+  // Simple regex for common date formats (YYYY-MM-DD, Month DD, YYYY, etc.) - heuristic only
+  const dateRegex = /(\d{4}-\d{2}-\d{2})|((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4})/i;
+  if (dateRegex.test(text)) {
+    score += 30;
+    reasons.push('Dates detected in content');
+  }
+
+  // Heuristic 3: Explicit Status Keywords (+40 points)
+  const statusKeywords = ['urgent', 'immediate action', 'critical', 'warning'];
+  for (const keyword of statusKeywords) {
+    if (lowerText.includes(keyword)) {
+      score += 40;
+      reasons.push(`High-priority keyword: "${keyword}"`);
+      break; // One is enough to boost
+    }
+  }
+
+  // Normalize Score (0-100)
+  score = Math.min(score, 100);
+
+  // Determine Severity
+  let severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';
+  if (score >= 80) severity = 'CRITICAL';
+  else if (score >= 50) severity = 'HIGH';
+  else if (score >= 20) severity = 'MEDIUM';
+
+  return { score, severity, reasons };
+};
+
 // --- Helper: Safe Email Sending (Hardening Feature 4) ---
 const safeSendEmail = async (userEmail: string, subject: string, text: string, html: string) => {
   if (!SENDGRID_API_KEY || !userEmail) return null;
@@ -175,12 +226,18 @@ export const checkDeadlineUpdates = functions.pubsub.schedule('every day 06:00')
           if (source.lastHash && source.lastHash !== newHash) {
             console.log(`Change detected for ${source.name}`);
 
+            // Awesome Mode: Calculate Importance
+            const { score, severity, reasons } = calculateImportance(normalized);
+
             const changeData = {
               sourceId,
               userId: source.userId,
               detectedAt: admin.firestore.FieldValue.serverTimestamp(),
               diffSummary: "Content changed.",
               sourceUrl: source.url,
+              score,
+              severity,
+              scoreReasons: reasons
             };
             await db.collection("changes").add(changeData);
 
@@ -188,14 +245,17 @@ export const checkDeadlineUpdates = functions.pubsub.schedule('every day 06:00')
             const userSnap = await db.collection("users").doc(source.userId).get();
             const user = userSnap.data();
 
-            // Safe Email Alert
+            // Safe Email Alert with Severity
             let emailError = null;
             if (user?.plan !== 'Starter') {
+              const emoji = severity === 'CRITICAL' ? '🚨' : severity === 'HIGH' ? '🔴' : severity === 'MEDIUM' ? '🟠' : '🟢';
+              const subject = `${emoji} [${severity}] Change Detected: ${source.name}`;
+
               const res = await safeSendEmail(
                 user?.email,
-                `Change Detected: ${source.name}`,
+                subject,
                 `Check dashboard: ${source.url}`,
-                `<p>Change detected. <a href="${source.url}">Source</a></p>`
+                `<p>Change detected. <strong>Severity: ${severity} (${score}/100)</strong></p><p><a href="${source.url}">Source</a></p>`
               );
               if (res?.error) emailError = res.error;
             }
@@ -209,7 +269,9 @@ export const checkDeadlineUpdates = functions.pubsub.schedule('every day 06:00')
               consecutive403: 0,
               consecutiveFailures: 0,
               lastError: null,
-              lastEmailError: emailError
+              lastEmailError: emailError,
+              lastChangeScore: score,
+              lastChangeSeverity: severity
             });
 
           } else {

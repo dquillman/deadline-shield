@@ -58,6 +58,29 @@ export default function ChangesPage() {
                                     {log.detectedAt ? new Date(log.detectedAt.seconds * 1000).toLocaleString() : 'Unknown Date'}
                                 </span>
                             </div>
+
+                            {log.severity && (
+                                <div style={{ marginBottom: 8 }}>
+                                    <span style={{
+                                        padding: '2px 6px',
+                                        borderRadius: 4,
+                                        fontSize: '0.8em',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                        backgroundColor: log.severity === 'CRITICAL' ? 'red' :
+                                            log.severity === 'HIGH' ? 'orange' :
+                                                log.severity === 'MEDIUM' ? '#DAA520' : 'green'
+                                    }}>
+                                        {log.severity} ({log.score}/100)
+                                    </span>
+                                    {log.scoreReasons && log.scoreReasons.length > 0 && (
+                                        <span style={{ marginLeft: 10, fontSize: '0.9em', color: '#555' }}>
+                                            Detected: {log.scoreReasons.join(', ')}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+
                             <div style={{ background: '#f9f9f9', padding: 10, borderRadius: 4, fontFamily: 'monospace', fontSize: '0.9em' }}>
                                 {log.diffSummary}
                             </div>

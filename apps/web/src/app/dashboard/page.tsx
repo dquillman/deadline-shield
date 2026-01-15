@@ -156,6 +156,20 @@ export default function DashboardPage() {
                   <span style={{ color: statusColor, fontWeight: 'bold' }}>
                     {source.lastStatus}
                   </span>
+                  {source.lastStatus === 'Changed' && source.lastChangeSeverity && (
+                    <span style={{
+                      marginLeft: 8,
+                      padding: '2px 6px',
+                      borderRadius: 4,
+                      fontSize: '0.8em',
+                      color: 'white',
+                      backgroundColor: source.lastChangeSeverity === 'CRITICAL' ? 'red' :
+                        source.lastChangeSeverity === 'HIGH' ? 'orange' :
+                          source.lastChangeSeverity === 'MEDIUM' ? '#DAA520' : 'green'
+                    }}>
+                      {source.lastChangeSeverity} ({source.lastChangeScore})
+                    </span>
+                  )}
                   {source.lastChecked && <div style={{ fontSize: '0.8em', color: '#666' }}>Checked: {new Date(source.lastChecked.seconds * 1000).toLocaleDateString()}</div>}
 
                   {source.needsCheck && (
