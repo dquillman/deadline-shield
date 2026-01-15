@@ -75,7 +75,7 @@ export function SettingsMenu() {
                             minWidth: "200px",
                             zIndex: 50,
                         }}
-                        className="dark:bg-slate-800 dark:border-blue-700"
+                        className="dark:bg-slate-900 dark:border-slate-700"
                     >
                         <h3
                             style={{
@@ -84,7 +84,7 @@ export function SettingsMenu() {
                                 marginBottom: "12px",
                                 color: "#374151",
                             }}
-                            className="dark:text-blue-100"
+                            className="dark:text-slate-100"
                         >
                             Appearance
                         </h3>
@@ -101,7 +101,7 @@ export function SettingsMenu() {
                                         borderRadius: "4px",
                                         background: theme === themeOption ? "#f3f4f6" : "transparent",
                                     }}
-                                    className={theme === themeOption ? "dark:bg-slate-700" : ""}
+                                    className={theme === themeOption ? "dark:bg-slate-800" : ""}
                                 >
                                     <input
                                         type="radio"
@@ -117,14 +117,14 @@ export function SettingsMenu() {
                                             textTransform: "capitalize",
                                             color: "#374151",
                                         }}
-                                        className="dark:text-blue-200"
+                                        className="dark:text-slate-300"
                                     >
                                         {themeOption}
                                     </span>
                                 </label>
                             ))}
                         </div>
-                        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-blue-800 text-[10px] text-gray-400 dark:text-blue-400 text-center">
+                        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-slate-800 text-[10px] text-gray-400 dark:text-slate-500 text-center">
                             v{APP_VERSION} ({new Date(BUILD_TIMESTAMP).toLocaleDateString()})
                         </div>
                     </div>

@@ -263,61 +263,61 @@ export default function DashboardPage() {
   if (!user) return <div style={{ padding: 20 }}><Link href="/auth/login">Please Login</Link></div>;
 
   return (
-    <div className="p-5 max-w-screen-xl mx-auto font-sans bg-white dark:bg-blue-950 dark:text-blue-50 min-h-screen transition-colors duration-300">
+    <div className="p-5 max-w-screen-xl mx-auto font-sans bg-white dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-300">
       {onboardingStep !== null && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
-          <div className="bg-white dark:bg-blue-900 p-8 rounded-xl max-w-md shadow-2xl border dark:border-blue-700">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-xl max-w-md shadow-2xl border dark:border-slate-700">
             {onboardingStep === 1 && (
               <div>
-                <h3 className="text-xl font-semibold mb-3 dark:text-blue-100">🎯 What we watch</h3>
-                <p className="text-gray-600 dark:text-blue-200 mb-5">We monitor pages that contain deadlines, regulatory changes, or obligations.</p>
-                <button onClick={() => setOnboardingStep(2)} className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">Next</button>
+                <h3 className="text-xl font-semibold mb-3 dark:text-slate-100">🎯 What we watch</h3>
+                <p className="text-gray-600 dark:text-slate-300 mb-5">We monitor pages that contain deadlines, regulatory changes, or obligations.</p>
+                <button onClick={() => setOnboardingStep(2)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">Next</button>
               </div>
             )}
             {onboardingStep === 2 && (
               <div>
-                <h3 className="text-xl font-semibold mb-3 dark:text-blue-100">🔔 How alerts work</h3>
-                <p className="text-gray-600 dark:text-blue-200 mb-5">You'll only be notified when something truly matters. We reduce noise so you can focus.</p>
-                <button onClick={() => setOnboardingStep(3)} className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">Next</button>
+                <h3 className="text-xl font-semibold mb-3 dark:text-slate-100">🔔 How alerts work</h3>
+                <p className="text-gray-600 dark:text-slate-300 mb-5">You'll only be notified when something truly matters. We reduce noise so you can focus.</p>
+                <button onClick={() => setOnboardingStep(3)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">Next</button>
               </div>
             )}
             {onboardingStep === 3 && (
               <div>
-                <h3 className="text-xl font-semibold mb-3 dark:text-blue-100">🛡️ What Guardian does</h3>
-                <p className="text-gray-600 dark:text-blue-200 mb-5">Guardian explains changes and recommends actions like "Update" or "Escalate".</p>
-                <button onClick={completeOnboarding} className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">Got it</button>
+                <h3 className="text-xl font-semibold mb-3 dark:text-slate-100">🛡️ What Guardian does</h3>
+                <p className="text-gray-600 dark:text-slate-300 mb-5">Guardian explains changes and recommends actions like "Update" or "Escalate".</p>
+                <button onClick={completeOnboarding} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">Got it</button>
               </div>
             )}
           </div>
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-8 bg-gray-50 dark:bg-blue-900/40 p-4 rounded-xl border border-gray-100 dark:border-blue-800/50">
-        <h1 className="text-3xl font-bold dark:text-blue-100 tracking-tight">Dashboard</h1>
+      <div className="flex justify-between items-center mb-8 bg-gray-50 dark:bg-slate-900/40 p-4 rounded-xl border border-gray-100 dark:border-slate-800/50">
+        <h1 className="text-3xl font-bold dark:text-slate-100 tracking-tight">Dashboard</h1>
         <div className="flex items-center gap-6">
-          <div className="text-sm dark:text-blue-200 hidden md:block">
-            <span className="bg-gray-200 dark:bg-blue-800 px-3 py-1 rounded-full text-xs font-medium">Plan: <strong className="dark:text-blue-100">{profile?.plan}</strong></span>
+          <div className="text-sm dark:text-slate-300 hidden md:block">
+            <span className="bg-gray-200 dark:bg-slate-800 px-3 py-1 rounded-full text-xs font-medium">Plan: <strong className="dark:text-slate-100">{profile?.plan}</strong></span>
             <span className="ml-4">Sources: {sources.length} / {PLAN_LIMITS[profile?.plan || 'Starter']}</span>
           </div>
-          <Link href="/changes" className="text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100 hover:underline text-sm font-medium mr-2">View Logs</Link>
-          <div className="bg-white dark:bg-blue-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-blue-700 hover:border-blue-300 dark:hover:border-blue-500 transition-colors">
+          <Link href="/changes" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline text-sm font-medium mr-2">View Logs</Link>
+          <div className="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 transition-colors">
             <SettingsMenu />
           </div>
         </div>
       </div>
 
-      <div className="bg-gray-100 dark:bg-blue-900/50 p-6 rounded-xl my-6 border border-transparent dark:border-blue-800">
-        <h3 className="text-lg font-semibold mb-3 dark:text-blue-50 flex items-center gap-2">
+      <div className="bg-gray-100 dark:bg-slate-900/50 p-6 rounded-xl my-6 border border-transparent dark:border-slate-800">
+        <h3 className="text-lg font-semibold mb-3 dark:text-slate-100 flex items-center gap-2">
           <span className="text-xl">➕</span> Add New Source
         </h3>
-        {error && <p className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">{error}</p>}
+        {error && <p className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">{error}</p>}
         <form onSubmit={handleAddSource} className="flex gap-3 flex-wrap">
           <input
             placeholder="Name (e.g. PMI Exam Updates)"
             value={newSource.name}
             onChange={(e) => setNewSource({ ...newSource, name: e.target.value })}
             required
-            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-lg border border-gray-300 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-blue-400/50"
+            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-slate-500"
           />
           <input
             placeholder="URL (https://...)"
@@ -325,56 +325,56 @@ export default function DashboardPage() {
             value={newSource.url}
             onChange={(e) => setNewSource({ ...newSource, url: e.target.value })}
             required
-            className="flex-[2] min-w-[300px] px-4 py-2.5 rounded-lg border border-gray-300 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-blue-400/50"
+            className="flex-[2] min-w-[300px] px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-slate-500"
           />
           <select
             value={newSource.frequency}
             onChange={(e) => setNewSource({ ...newSource, frequency: e.target.value })}
-            className="px-4 py-2.5 rounded-lg border border-gray-300 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none cursor-pointer"
+            className="px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent outline-none cursor-pointer"
           >
             <option value="Daily">Daily</option>
             <option value="Weekly">Weekly</option>
           </select>
-          <button type="submit" disabled={adding} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:bg-blue-400 text-white rounded-lg transition-colors">
+          <button type="submit" disabled={adding} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors">
             {adding ? 'Adding...' : 'Add Source'}
           </button>
         </form>
       </div>
 
       {unacknowledgedCount === 0 && sources.length > 0 && (
-        <div className="bg-green-50 dark:bg-blue-900/30 border border-green-200 dark:border-blue-600 text-green-700 dark:text-blue-200 p-3 rounded-lg mb-5 flex items-center gap-2 text-sm">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 p-3 rounded-lg mb-5 flex items-center gap-2 text-sm">
           <span>🛡️</span> All monitored deadlines are currently under control.
         </div>
       )}
 
-      <div className="overflow-hidden bg-white dark:bg-blue-900/20 rounded-xl shadow-sm border border-gray-200 dark:border-blue-800">
+      <div className="overflow-hidden bg-white dark:bg-slate-900/20 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800">
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="border-b border-gray-200 dark:border-blue-800 bg-gray-50/50 dark:bg-blue-900/40">
-              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">Source</th>
-              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">
+            <tr className="border-b border-gray-200 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/40">
+              <th className="p-5 font-semibold text-gray-700 dark:text-slate-300">Source</th>
+              <th className="p-5 font-semibold text-gray-700 dark:text-slate-300">
                 Status
-                <div className="text-xs text-gray-500 dark:text-blue-400 font-normal mt-0.5">Guardian explains why changes matter</div>
+                <div className="text-xs text-gray-500 dark:text-slate-400 font-normal mt-0.5">Guardian explains why changes matter</div>
               </th>
-              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">Last Check</th>
-              <th className="p-5 font-semibold text-gray-700 dark:text-blue-200">Actions</th>
+              <th className="p-5 font-semibold text-gray-700 dark:text-slate-300">Last Check</th>
+              <th className="p-5 font-semibold text-gray-700 dark:text-slate-300">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sources.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-12 text-center text-gray-500 dark:text-blue-300">
+                <td colSpan={4} className="p-12 text-center text-gray-500 dark:text-slate-400">
                   <div className="text-4xl mb-3 opacity-80">🔭</div>
-                  <div className="text-xl font-medium mb-2 text-gray-700 dark:text-blue-200">No sources added yet.</div>
+                  <div className="text-xl font-medium mb-2 text-gray-700 dark:text-slate-300">No sources added yet.</div>
                   <div className="text-sm opacity-80">Deadline Shield is watching quietly. Add a URL above to begin.</div>
                 </td>
               </tr>
             )}
             {sources.length > 0 && sources.filter(s => s.lastStatus === 'Changed').length === 0 && (
               <tr>
-                <td colSpan={4} className="p-12 text-center text-gray-500 dark:text-blue-300">
+                <td colSpan={4} className="p-12 text-center text-gray-500 dark:text-slate-400">
                   <div className="text-4xl mb-3 opacity-80">✅</div>
-                  <div className="text-lg font-medium mb-1 text-gray-700 dark:text-blue-200">No recent changes detected.</div>
+                  <div className="text-lg font-medium mb-1 text-gray-700 dark:text-slate-300">No recent changes detected.</div>
                   <div className="text-sm opacity-80">Everything is stable. We'll alert you if deadlines move.</div>
                 </td>
               </tr>
@@ -392,20 +392,20 @@ export default function DashboardPage() {
               return (
                 <tr
                   key={source.id}
-                  className="hover:bg-gray-50 dark:hover:bg-blue-900/30 transition-colors border-b border-gray-100 dark:border-blue-800/50 last:border-0"
+                  className="hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors border-b border-gray-100 dark:border-slate-800/50 last:border-0"
                   style={{ opacity: source.ackStatus ? 0.6 : 1, filter: source.ackStatus ? 'grayscale(50%)' : 'none' }}
                 >
                   <td className="px-6 py-5">
-                    <div className="font-medium text-gray-900 dark:text-blue-50 text-lg mb-0.5">{source.name}</div>
-                    <div className="text-sm text-gray-500 dark:text-blue-300 truncate max-w-xs font-mono opacity-80" title={source.url}>{source.url}</div>
+                    <div className="font-medium text-gray-900 dark:text-slate-100 text-lg mb-0.5">{source.name}</div>
+                    <div className="text-sm text-gray-500 dark:text-slate-400 truncate max-w-xs font-mono opacity-80" title={source.url}>{source.url}</div>
                     {source.confidenceLevel === 'HIGH' && (
                       <div className="text-xs text-teal-600 dark:text-cyan-400 flex items-center gap-1 mt-2 font-medium bg-teal-50 dark:bg-cyan-950/30 px-2 py-0.5 rounded-full w-fit">
                         🛡️ Historically Stable
                       </div>
                     )}
                     <div className="text-xs flex gap-2 mt-2">
-                      {source.manualOnly && <span className="bg-gray-800 dark:bg-blue-950 border border-gray-700 dark:border-blue-800 text-white dark:text-blue-200 px-2 py-0.5 rounded shadow-sm">MANUAL</span>}
-                      {source.watchMode && <span className="bg-gray-200 dark:bg-blue-900/50 dark:text-blue-200 px-2 py-0.5 rounded border border-transparent dark:border-blue-800">{source.watchMode}</span>}
+                      <span className="bg-gray-800 dark:bg-slate-800 border border-gray-700 dark:border-slate-700 text-white dark:text-slate-200 px-2 py-0.5 rounded shadow-sm">MANUAL</span>
+                      {source.watchMode && <span className="bg-gray-200 dark:bg-slate-800/50 dark:text-slate-300 px-2 py-0.5 rounded border border-transparent dark:border-slate-700">{source.watchMode}</span>}
                     </div>
                   </td>
                   <td style={{ padding: 10 }}>
